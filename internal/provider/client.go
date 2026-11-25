@@ -76,11 +76,11 @@ func newAPIClient(ctx context.Context, endpoint string, token string, version st
 	}, nil
 }
 
-// isAPIKey returns true when the token looks like a raw Cursor user API key
-// that must be exchanged before use.
+// isAPIKey returns true when the token looks like a raw Cursor API key, user or
+// fine-grained, that must be exchanged before use.
 func isAPIKey(token string) bool {
 	trimmed := strings.TrimSpace(token)
-	return strings.HasPrefix(trimmed, "key_") || strings.HasPrefix(trimmed, "crsr_")
+	return strings.HasPrefix(trimmed, "key_") || strings.HasPrefix(trimmed, "crsr_") || strings.HasPrefix(trimmed, "grok_")
 }
 
 // exchangeResponse is the JSON body returned by /auth/exchange_user_api_key.
@@ -90,7 +90,7 @@ type exchangeResponse struct {
 }
 
 // resolveToken returns a bearer token suitable for the Authorization header.
-// If the supplied token is a raw API key (key_ prefix), it is exchanged via
+// If the supplied token is a raw API key (key_, crsr_ or grok_ prefix), it is exchanged via
 // the /auth/exchange_user_api_key endpoint first. Otherwise the token is
 // returned as-is.
 func resolveToken(ctx context.Context, httpClient httpDoer, endpoint string, token string) (string, error) {
